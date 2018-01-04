@@ -7,6 +7,9 @@ class Cube(object):
                    'u':[['w']*3 for i in range(3)],
                    'd':[['y']*3 for i in range(3)]}
 
+    moves = ['l', 'l\'', 'l2', 'f', 'f\'', 'f2', 'r', 'r\'', 'r2',
+             'b', 'b\'', 'b2', 'u', 'u\'', 'u2', 'd', 'd\'', 'd2'] 
+
     def __init__(self, randomizer=None):
         self.dict = {'l':[['o']*3 for i in range(3)],
                      'f':[['g']*3 for i in range(3)],
@@ -72,9 +75,46 @@ class Cube(object):
 
     #Solve the cube
     def solve(self):
-        print('Solver not written yet.')
-    #     arr = ['l', 'l\'', 'l2', 'f', 'f\'', 'f2', 'r', 'r\'', 'r2',
-    #            'b', 'b\'', 'b2', 'u', 'u\'', 'u2', 'd', 'd\'', 'd2']            
+        self.__rec_solve(15, [])
+
+    #Uses depth first search with a maximum iteration depth to find a solution
+    def __rec_solve(self, num_left, moves_taken):
+        if self.check_solved():
+            self.__print_moves(moves_taken)
+            return True
+        elif num_left == 0:
+            return False
+        else:
+            for move in Cube.moves:
+                self.parse_randomizer(move)
+                moves_taken.append(move)
+                if self.__rec_solve(num_left - 1, moves_taken):
+                    return True
+                moves_taken.pop()
+                #Revert the move just taken to try the next move
+                if move[-1:] == '\'':
+                    self.parse_randomizer(move[:1])
+                elif move[-1:] == '2':
+                    self.parse_randomizer(move)
+                else:
+                    self.parse_randomizer(move + '\'')
+
+    #Checks if cube is solved
+    def check_solved(self):
+        faces = ['l', 'f', 'r', 'b', 'u', 'd']
+        for i in range(3):
+            for j in range(3):
+                for k in range(6):
+                    if self.dict[faces[k]][i][j] != Cube.solved_cube[faces[k]][i][j]:
+                        return False
+        return True
+
+    #Prints contents of moves list
+    def __print_moves(self, moves_taken):
+        print('Moves needed to solve: ', end='')
+        for move in moves_taken:
+            print(move, end=' ')
+        print()
 
     #Moving left side of cube
     def l(self):
@@ -306,18 +346,25 @@ class Cube(object):
 def main():
     rubik = Cube(input('Enter cube randomizer string in WCA format: '))
     rubik.display()
-    print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\nAnything else to exit')
+    print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\n4 to check if cube is solved')
+    print('Anything else to exit')
     choice = input('Enter input here: ')
-    while (choice == '1' or choice == '2' or choice == '3'):
+    while (choice == '1' or choice == '2' or choice == '3' or choice == '4'):
         print()
         if choice == '1':
             rubik.solve()
         elif choice == '2':
             rubik = Cube(input('Enter cube randomizer string in WCA format: '))
-        else:
+        elif choice == '3':
             rubik.parse_randomizer(input('Enter cube randomizer string in WCA format: '))
+        else:
+            if rubik.check_solved():
+                print('Cube is solved.')
+            else:
+                print('Cube is not solved.')
         rubik.display()
-        print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\nAnything else to exit')
+        print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\n4 to check if cube is solved')
+        print('Anything else to exit')
         choice = input('Enter input here: ')
 
 if __name__ == '__main__':
