@@ -1,4 +1,4 @@
-# RubikSolver
+# rubik-solver
 Represents a Rubik cube and solves it
 Uses a Python dictionary to store the state of the cube and has methods to alter the cube state using WCA notation.
 
