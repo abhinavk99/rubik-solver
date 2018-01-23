@@ -1,22 +1,26 @@
 #Represents a Rubik's cube
 class Cube(object):
-    solved_cube = {'l':[['o']*3 for i in range(3)],
-                   'f':[['g']*3 for i in range(3)],
-                   'r':[['r']*3 for i in range(3)],
-                   'b':[['b']*3 for i in range(3)],
-                   'u':[['w']*3 for i in range(3)],
-                   'd':[['y']*3 for i in range(3)]}
+    solved_cube = {
+        'l':[['o']*3 for i in range(3)],
+        'f':[['g']*3 for i in range(3)],
+        'r':[['r']*3 for i in range(3)],
+        'b':[['b']*3 for i in range(3)],
+        'u':[['w']*3 for i in range(3)],
+        'd':[['y']*3 for i in range(3)]
+    }
 
     moves = ['l', 'l\'', 'l2', 'f', 'f\'', 'f2', 'r', 'r\'', 'r2',
              'b', 'b\'', 'b2', 'u', 'u\'', 'u2', 'd', 'd\'', 'd2'] 
 
     def __init__(self, randomizer=None):
-        self.dict = {'l':[['o']*3 for i in range(3)],
-                     'f':[['g']*3 for i in range(3)],
-                     'r':[['r']*3 for i in range(3)],
-                     'b':[['b']*3 for i in range(3)],
-                     'u':[['w']*3 for i in range(3)],
-                     'd':[['y']*3 for i in range(3)]}
+        self.dict = {
+            'l':[['o']*3 for i in range(3)],
+            'f':[['g']*3 for i in range(3)],
+            'r':[['r']*3 for i in range(3)],
+            'b':[['b']*3 for i in range(3)],
+            'u':[['w']*3 for i in range(3)],
+            'd':[['y']*3 for i in range(3)]
+        }
         self.parse_randomizer(randomizer)
 
     #Goes through the randomizer string to change the cube state move by move
