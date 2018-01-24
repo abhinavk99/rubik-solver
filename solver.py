@@ -1,35 +1,36 @@
-#Represents a Rubik's cube
+# Represents a Rubik's cube
 class Cube(object):
     solved_cube = {
-        'l':[['o']*3 for i in range(3)],
-        'f':[['g']*3 for i in range(3)],
-        'r':[['r']*3 for i in range(3)],
-        'b':[['b']*3 for i in range(3)],
-        'u':[['w']*3 for i in range(3)],
-        'd':[['y']*3 for i in range(3)]
+        'l': [['o']*3 for i in range(3)],
+        'f': [['g']*3 for i in range(3)],
+        'r': [['r']*3 for i in range(3)],
+        'b': [['b']*3 for i in range(3)],
+        'u': [['w']*3 for i in range(3)],
+        'd': [['y']*3 for i in range(3)]
     }
 
     moves = ['l', 'l\'', 'l2', 'f', 'f\'', 'f2', 'r', 'r\'', 'r2',
-             'b', 'b\'', 'b2', 'u', 'u\'', 'u2', 'd', 'd\'', 'd2'] 
+             'b', 'b\'', 'b2', 'u', 'u\'', 'u2', 'd', 'd\'', 'd2']
 
     def __init__(self, randomizer=None):
         self.dict = {
-            'l':[['o']*3 for i in range(3)],
-            'f':[['g']*3 for i in range(3)],
-            'r':[['r']*3 for i in range(3)],
-            'b':[['b']*3 for i in range(3)],
-            'u':[['w']*3 for i in range(3)],
-            'd':[['y']*3 for i in range(3)]
+            'l': [['o']*3 for i in range(3)],
+            'f': [['g']*3 for i in range(3)],
+            'r': [['r']*3 for i in range(3)],
+            'b': [['b']*3 for i in range(3)],
+            'u': [['w']*3 for i in range(3)],
+            'd': [['y']*3 for i in range(3)]
         }
         self.parse_randomizer(randomizer)
 
-    #Goes through the randomizer string to change the cube state move by move
+    # Goes through the randomizer string to change the cube state move by move
     def parse_randomizer(self, randomizer):
-        #Checks if the randomizer String is valid by WCA standards
+        # Checks if the randomizer String is valid by WCA standards
         if randomizer is not None:
             if isinstance(randomizer, str) and len(randomizer) is not 0:
                 lower = randomizer.lower()
-                trans = lower.translate(dict.fromkeys(map(ord, ' \'lfrbud2'), None))
+                trans = lower.translate(dict.fromkeys(map(ord, ' \'lfrbud2'),
+                                        None))
                 if len(trans) is 0:
                     arr = randomizer.strip().split(' ')
                     for move in arr:
@@ -73,15 +74,15 @@ class Cube(object):
                             print('Reverted to solved state as randomizer could not be parsed correctly')
                             self.dict = dict(Cube.solved_cube)
                 else:
-                    print('Cube state unchanged as randomizer was not in valid WCA format') 
+                    print('Cube state unchanged as randomizer was not invalid WCA format')
             else:
                 print('Cube state unchanged as no randomizer was passed in')
 
-    #Solve the cube
+    # Solve the cube
     def solve(self):
         self.__rec_solve(15, [])
 
-    #Uses depth first search with a maximum iteration depth to find a solution
+    # Uses depth first search with a maximum iteration depth to find a solution
     def __rec_solve(self, num_left, moves_taken):
         if self.check_solved():
             self.__print_moves(moves_taken)
@@ -95,7 +96,7 @@ class Cube(object):
                 if self.__rec_solve(num_left - 1, moves_taken):
                     return True
                 moves_taken.pop()
-                #Revert the move just taken to try the next move
+                # Revert the move just taken to try the next move
                 if move[-1:] == '\'':
                     self.parse_randomizer(move[:1])
                 elif move[-1:] == '2':
@@ -103,24 +104,26 @@ class Cube(object):
                 else:
                     self.parse_randomizer(move + '\'')
 
-    #Checks if cube is solved
+    # Checks if cube is solved
     def check_solved(self):
         faces = ['l', 'f', 'r', 'b', 'u', 'd']
         for i in range(3):
             for j in range(3):
                 for k in range(6):
-                    if self.dict[faces[k]][i][j] != Cube.solved_cube[faces[k]][i][j]:
+                    curr_facelet = self.dict[faces[k]][i][j]
+                    solved_facelet = Cube.solved_cube[faces[k]][i][j]
+                    if curr_facelet != solved_facelet:
                         return False
         return True
 
-    #Prints contents of moves list
+    # Prints contents of moves list
     def __print_moves(self, moves_taken):
         print('Moves needed to solve: ', end='')
         for move in moves_taken:
             print(move, end=' ')
         print()
 
-    #Moving left side of cube
+    # Moving left side of cube
     def l(self):
         self.__rotate_clock('l')
         faces = ['u', 'b', 'd', 'f']
@@ -182,7 +185,7 @@ class Cube(object):
             self.dict['u'][2][i], self.dict['d'][0][2 - i] = self.dict['d'][0][2 - i], self.dict['u'][2][i]
             self.dict['r'][i][0], self.dict['l'][2 - i][2] = self.dict['l'][2 - i][2], self.dict['r'][i][0]
 
-    # Moving right side of cube 
+    # Moving right side of cube
     def r(self):
         self.__rotate_clock('r')
         faces = ['u', 'f', 'd', 'b']
@@ -213,7 +216,7 @@ class Cube(object):
             self.dict['u'][i][2], self.dict['d'][i][2] = self.dict['d'][i][2], self.dict['u'][i][2]
             self.dict['f'][i][2], self.dict['b'][i][2] = self.dict['b'][i][2], self.dict['f'][i][2]
 
-    # Moving back side of cube  
+    # Moving back side of cube
     def b(self):
         self.__rotate_clock('b')
         temp_arr = list(self.dict['u'][0])
@@ -244,7 +247,7 @@ class Cube(object):
             self.dict['u'][0][i], self.dict['d'][2][2 - i] = self.dict['d'][2][2 - i], self.dict['u'][0][i]
             self.dict['r'][i][2], self.dict['l'][2 - i][0] = self.dict['l'][2 - i][0], self.dict['r'][i][2]
 
-    # Moving upper side of cube 
+    # Moving upper side of cube
     def u(self):
         self.__rotate_clock('u')
         temp = list(self.dict['f'][0])
@@ -271,7 +274,7 @@ class Cube(object):
         for i in range(3):
             self.dict['f'][0][i], self.dict['b'][2][2 - i] = self.dict['b'][2][2 - i], self.dict['f'][0][i]
 
-    # Moving down side of cube  
+    # Moving down side of cube
     def d(self):
         self.__rotate_clock('d')
         temp = list(self.dict['f'][2])
@@ -298,7 +301,7 @@ class Cube(object):
         for i in range(3):
             self.dict['f'][2][i], self.dict['b'][0][2 - i] = self.dict['b'][0][2 - i], self.dict['f'][2][i]
 
-    #Rotate face clockwise
+    # Rotate face clockwise
     def __rotate_clock(self, face):
         temp = self.dict[face][0][0]
         self.dict[face][0][0] = self.dict[face][2][0]
@@ -311,7 +314,7 @@ class Cube(object):
         self.dict[face][2][1] = self.dict[face][1][2]
         self.dict[face][1][2] = temp
 
-    #Rotate face counterclockwise
+    # Rotate face counterclockwise
     def __rotate_counter(self, face):
         temp = self.dict[face][0][0]
         self.dict[face][0][0] = self.dict[face][0][2]
@@ -324,14 +327,14 @@ class Cube(object):
         self.dict[face][2][1] = self.dict[face][1][0]
         self.dict[face][1][0] = temp
 
-    #Rotate face twice
+    # Rotate face twice
     def __rotate__2(self, face):
         self.dict[face][0][0], self.dict[face][2][2] = self.dict[face][2][2], self.dict[face][0][0]
         self.dict[face][0][2], self.dict[face][2][0] = self.dict[face][2][0], self.dict[face][0][2]
         self.dict[face][0][1], self.dict[face][2][1] = self.dict[face][2][1], self.dict[face][0][1]
         self.dict[face][1][0], self.dict[face][1][2] = self.dict[face][1][2], self.dict[face][1][0]
 
-    #Display cube in unfolded format (cross on its side)
+    # Display cube in unfolded format (cross on its side)
     def display(self):
         mat = self.dict['u']
         for i in range(3):
@@ -340,17 +343,20 @@ class Cube(object):
         for j in range(3):
             for i in range(3):
                 mat = self.dict[arr[i]]
-                print(mat[j][0] + ' ' + mat[j][1] + ' ' + mat[j][2] + ' ', end='')
+                print(mat[j][0] + ' ' + mat[j][1] + ' ' + mat[j][2] + ' ',
+                      end='')
             mat = self.dict['b']
             print(mat[2 - j][2] + ' ' + mat[2 - j][1] + ' ' + mat[2 - j][0])
         mat = self.dict['d']
         for i in range(3):
             print('      ' + mat[i][0] + ' ' + mat[i][1] + ' ' + mat[i][2])
 
+
 def main():
     rubik = Cube(input('Enter cube randomizer string in WCA format: '))
     rubik.display()
-    print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\n4 to check if cube is solved')
+    print("""\nOptions:\n1 to solve\n2 to create new cube
+3 to enter randomizer string\n4 to check if cube is solved""")
     print('Anything else to exit')
     choice = input('Enter input here: ')
     while (choice == '1' or choice == '2' or choice == '3' or choice == '4'):
@@ -367,9 +373,11 @@ def main():
             else:
                 print('Cube is not solved.')
         rubik.display()
-        print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\n4 to check if cube is solved')
+        print("""\nOptions:\n1 to solve\n2 to create new cube
+3 to enter randomizer string\n4 to check if cube is solved""")
         print('Anything else to exit')
         choice = input('Enter input here: ')
+
 
 if __name__ == '__main__':
     main()
