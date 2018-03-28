@@ -385,21 +385,22 @@ class Cube(object):
             self.dict['f'][2][i], self.dict['b'][0][2 - i] = self.dict['b'][0][2 - i], self.dict['f'][2][i]
 
     # Display cube in unfolded format (cross on its side)
-    def display(self):
+    def __str__(self):
+        res = ''
         mat = self.dict['u']
         for i in range(3):
-            print('      ' + mat[i][0] + ' ' + mat[i][1] + ' ' + mat[i][2])
+            res += ('      ' + mat[i][0] + ' ' + mat[i][1] + ' ' + mat[i][2] + '\n')
         arr = ['l', 'f', 'r']
         for j in range(3):
             for i in range(3):
                 mat = self.dict[arr[i]]
-                print(mat[j][0] + ' ' + mat[j][1] + ' ' + mat[j][2] + ' ',
-                      end='')
+                res += (mat[j][0] + ' ' + mat[j][1] + ' ' + mat[j][2] + ' ')
             mat = self.dict['b']
-            print(mat[2 - j][2] + ' ' + mat[2 - j][1] + ' ' + mat[2 - j][0])
+            res += (mat[2 - j][2] + ' ' + mat[2 - j][1] + ' ' + mat[2 - j][0] + '\n')
         mat = self.dict['d']
         for i in range(3):
-            print('      ' + mat[i][0] + ' ' + mat[i][1] + ' ' + mat[i][2])
+            res += ('      ' + mat[i][0] + ' ' + mat[i][1] + ' ' + mat[i][2] + '\n')
+        return res
 
 
 display_msg = """\nOptions:\n1 to solve\n2 to create new cube
@@ -416,7 +417,7 @@ def main():
             rubik = Cube(scramble=True)
         elif ch == '3':
             rubik = Cube()
-        rubik.display()
+        print(str(rubik))
         print(display_msg)
         choice = input('Enter input here: ')
         while (choice in ('1', '2', '3', '4', '5', '6')):
@@ -437,7 +438,7 @@ def main():
             elif choice == '6':
                 rubik.reset()
                 rubik.scramble()
-            rubik.display()
+            print(str(rubik))
             print(display_msg)
             choice = input('Enter input here: ')
     else:
