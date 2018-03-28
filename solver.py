@@ -111,10 +111,13 @@ class Cube(object):
 
     #Prints contents of moves list
     def __print_moves(self, moves_taken):
-        print('Moves needed to solve: ', end='')
-        for move in moves_taken:
-            print(move, end=' ')
-        print()
+        if len(moves_taken) == 0:
+            print('Already in solved state')
+        else:
+            print('Moves needed to solve: ', end='')
+            for move in moves_taken:
+                print(move, end=' ')
+            print()
 
     #Moving left side of cube
     def l(self):
