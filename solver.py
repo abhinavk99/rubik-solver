@@ -1,14 +1,70 @@
 import random
 
+# Represents a face of the cube
+class Face(object):
+
+    def __init__(self, value):
+        self.mat = [[value]*3 for i in range(3)]
+
+    # Rotate face clockwise
+    def rotate_clock(self):
+        temp = self.mat[0][0]
+        self.mat[0][0] = self.mat[2][0]
+        self.mat[2][0] = self.mat[2][2]
+        self.mat[2][2] = self.mat[0][2]
+        self.mat[0][2] = temp
+        temp = self.mat[0][1]
+        self.mat[0][1] = self.mat[1][0]
+        self.mat[1][0] = self.mat[2][1]
+        self.mat[2][1] = self.mat[1][2]
+        self.mat[1][2] = temp
+
+    # Rotate face counterclockwise
+    def rotate_counter(self):
+        temp = self.mat[0][0]
+        self.mat[0][0] = self.mat[0][2]
+        self.mat[0][2] = self.mat[2][2]
+        self.mat[2][2] = self.mat[2][0]
+        self.mat[2][0] = temp
+        temp = self.mat[0][1]
+        self.mat[0][1] = self.mat[1][2]
+        self.mat[1][2] = self.mat[2][1]
+        self.mat[2][1] = self.mat[1][0]
+        self.mat[1][0] = temp
+
+    # Rotate face twice
+    def rotate_2(self):
+        self.mat[0][0], self.mat[2][2] = self.mat[2][2], self.mat[0][0]
+        self.mat[0][2], self.mat[2][0] = self.mat[2][0], self.mat[0][2]
+        self.mat[0][1], self.mat[2][1] = self.mat[2][1], self.mat[0][1]
+        self.mat[1][0], self.mat[1][2] = self.mat[1][2], self.mat[1][0]
+
+    def __eq__(self, other):
+        for i in range(3):
+            for j in range(3):
+                if self.mat[i][j] != other.mat[i][j]:
+                    return False
+        return True
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __getitem__(self, key):
+        return self.mat[key]
+
+    def __setitem__(self, key, value):
+        self.mat[key] = value
+
+
 #Represents a Rubik's cube
 class Cube(object):
     solved_cube = {
-        'l': [['o']*3 for i in range(3)],
-        'f': [['g']*3 for i in range(3)],
-        'r': [['r']*3 for i in range(3)],
-        'b': [['b']*3 for i in range(3)],
-        'u': [['w']*3 for i in range(3)],
-        'd': [['y']*3 for i in range(3)]
+        'l': Face('o'),
+        'f': Face('g'),
+        'r': Face('r'),
+        'b': Face('b'),
+        'u': Face('w'),
+        'd': Face('y')
     }
 
     moves = ['l', 'l\'', 'l2', 'f', 'f\'', 'f2', 'r', 'r\'', 'r2',
@@ -21,20 +77,20 @@ class Cube(object):
         else:
             self.parse_randomizer(randomizer)
 
-    #Resets cube to solved state
+    # Resets cube to solved state
     def reset(self, print_msg=False):
         self.dict = {
-            'l': [['o']*3 for i in range(3)],
-            'f': [['g']*3 for i in range(3)],
-            'r': [['r']*3 for i in range(3)],
-            'b': [['b']*3 for i in range(3)],
-            'u': [['w']*3 for i in range(3)],
-            'd': [['y']*3 for i in range(3)]
+            'l': Face('o'),
+            'f': Face('g'),
+            'r': Face('r'),
+            'b': Face('b'),
+            'u': Face('w'),
+            'd': Face('y')
         }
         if print_msg:
             print('Cube was reset to solved state')
 
-    #Randomly scrambles the cube
+    # Randomly scrambles the cube
     def scramble(self):
         scramble_length = random.randint(5, 15)
         scramble_moves = random.choices(Cube.moves, k=scramble_length)
@@ -127,13 +183,17 @@ class Cube(object):
     # Checks if cube is solved
     def check_solved(self):
         faces = ['l', 'f', 'r', 'b', 'u', 'd']
-        for i in range(3):
-            for j in range(3):
-                for k in range(6):
-                    curr_facelet = self.dict[faces[k]][i][j]
-                    solved_facelet = Cube.solved_cube[faces[k]][i][j]
-                    if curr_facelet != solved_facelet:
-                        return False
+        # for i in range(3):
+        #     for j in range(3):
+        #         for k in range(6):
+        #             curr_facelet = self.dict[faces[k]][i][j]
+        #             solved_facelet = Cube.solved_cube[faces[k]][i][j]
+        #             if curr_facelet != solved_facelet:
+        #                 return False
+
+        for face in faces:
+            if self.dict[face] != Cube.solved_cube[face]:
+                return False
         return True
 
     # Prints contents of moves list
@@ -148,7 +208,7 @@ class Cube(object):
 
     # Moving left side of cube
     def l(self):
-        self.__rotate_clock('l')
+        self.dict['l'].rotate_clock()
         faces = ['u', 'b', 'd', 'f']
         temp_arr = []
         for i in range(3):
@@ -160,7 +220,7 @@ class Cube(object):
             self.dict['f'][i][0] = temp_arr[i]
 
     def l_prime(self):
-        self.__rotate_counter('l')
+        self.dict['l'].rotate_counter()
         faces = ['u', 'f', 'd', 'b']
         temp_arr = []
         for i in range(3):
@@ -172,14 +232,14 @@ class Cube(object):
             self.dict['b'][i][0] = temp_arr[i]
 
     def l_2(self):
-        self.__rotate__2('l')
+        self.dict['l'].rotate_2()
         for i in range(3):
             self.dict['u'][i][0], self.dict['d'][i][0] = self.dict['d'][i][0], self.dict['u'][i][0]
             self.dict['f'][i][0], self.dict['b'][i][0] = self.dict['b'][i][0], self.dict['f'][i][0]
 
     # Moving front side of cube
     def f(self):
-        self.__rotate_clock('f')
+        self.dict['f'].rotate_clock()
         temp_arr = list(self.dict['u'][2])
         for i in range(3):
             self.dict['u'][2][i] = self.dict['l'][2 - i][2]
@@ -191,7 +251,7 @@ class Cube(object):
             self.dict['r'][i][0] = temp_arr[i]
 
     def f_prime(self):
-        self.__rotate_counter('f')
+        self.dict['f'].rotate_counter()
         temp_arr = list(self.dict['u'][2])
         for i in range(3):
             self.dict['u'][2][i] = self.dict['r'][i][0]
@@ -203,14 +263,14 @@ class Cube(object):
             self.dict['l'][2 - i][2] = temp_arr[i]
 
     def f_2(self):
-        self.__rotate__2('f')
+        self.dict['f'].rotate_2()
         for i in range(3):
             self.dict['u'][2][i], self.dict['d'][0][2 - i] = self.dict['d'][0][2 - i], self.dict['u'][2][i]
             self.dict['r'][i][0], self.dict['l'][2 - i][2] = self.dict['l'][2 - i][2], self.dict['r'][i][0]
 
     # Moving right side of cube
     def r(self):
-        self.__rotate_clock('r')
+        self.dict['r'].rotate_clock()
         faces = ['u', 'f', 'd', 'b']
         temp_arr = []
         for i in range(3):
@@ -222,7 +282,7 @@ class Cube(object):
             self.dict['b'][i][2] = temp_arr[i]
 
     def r_prime(self):
-        self.__rotate_counter('r')
+        self.dict['r'].rotate_counter()
         faces = ['u', 'b', 'd', 'f']
         temp_arr = []
         for i in range(3):
@@ -234,14 +294,14 @@ class Cube(object):
             self.dict['f'][i][2] = temp_arr[i]
 
     def r_2(self):
-        self.__rotate__2('r')
+        self.dict['r'].rotate_2()
         for i in range(3):
             self.dict['u'][i][2], self.dict['d'][i][2] = self.dict['d'][i][2], self.dict['u'][i][2]
             self.dict['f'][i][2], self.dict['b'][i][2] = self.dict['b'][i][2], self.dict['f'][i][2]
 
     # Moving back side of cube
     def b(self):
-        self.__rotate_clock('b')
+        self.dict['b'].rotate_clock()
         temp_arr = list(self.dict['u'][0])
         for i in range(3):
             self.dict['u'][0][i] = self.dict['r'][i][2]
@@ -253,7 +313,7 @@ class Cube(object):
             self.dict['l'][2 - i][0] = temp_arr[i]
 
     def b_prime(self):
-        self.__rotate_counter('b')
+        self.dict['b'].rotate_counter()
         temp_arr = list(self.dict['u'][0])
         for i in range(3):
             self.dict['u'][0][i] = self.dict['l'][2 - i][0]
@@ -265,14 +325,14 @@ class Cube(object):
             self.dict['r'][i][2] = temp_arr[i]
 
     def b_2(self):
-        self.__rotate__2('b')
+        self.dict['b'].rotate_2()
         for i in range(3):
             self.dict['u'][0][i], self.dict['d'][2][2 - i] = self.dict['d'][2][2 - i], self.dict['u'][0][i]
             self.dict['r'][i][2], self.dict['l'][2 - i][0] = self.dict['l'][2 - i][0], self.dict['r'][i][2]
 
     # Moving upper side of cube
     def u(self):
-        self.__rotate_clock('u')
+        self.dict['u'].rotate_clock()
         temp = list(self.dict['f'][0])
         self.dict['f'][0] = list(self.dict['r'][0])
         for i in range(3):
@@ -282,7 +342,7 @@ class Cube(object):
         self.dict['l'][0] = temp
 
     def u_prime(self):
-        self.__rotate_counter('u')
+        self.dict['u'].rotate_counter()
         temp = list(self.dict['f'][0])
         self.dict['f'][0] = list(self.dict['l'][0])
         for i in range(3):
@@ -292,14 +352,14 @@ class Cube(object):
         self.dict['r'][0] = temp
 
     def u_2(self):
-        self.__rotate__2('u')
+        self.dict['u'].rotate_2()
         self.dict['l'][0], self.dict['r'][0] = self.dict['r'][0], self.dict['l'][0]
         for i in range(3):
             self.dict['f'][0][i], self.dict['b'][2][2 - i] = self.dict['b'][2][2 - i], self.dict['f'][0][i]
 
     # Moving down side of cube
     def d(self):
-        self.__rotate_clock('d')
+        self.dict['d'].rotate_clock()
         temp = list(self.dict['f'][2])
         self.dict['f'][2] = list(self.dict['l'][2])
         for i in range(3):
@@ -309,7 +369,7 @@ class Cube(object):
         self.dict['r'][2] = temp
 
     def d_prime(self):
-        self.__rotate_counter('d')
+        self.dict['d'].rotate_counter()
         temp = list(self.dict['f'][2])
         self.dict['f'][2] = list(self.dict['r'][2])
         for i in range(3):
@@ -319,43 +379,10 @@ class Cube(object):
         self.dict['l'][2] = temp
 
     def d_2(self):
-        self.__rotate__2('d')
+        self.dict['d'].rotate_2()
         self.dict['l'][2], self.dict['r'][2] = self.dict['r'][2], self.dict['l'][2]
         for i in range(3):
             self.dict['f'][2][i], self.dict['b'][0][2 - i] = self.dict['b'][0][2 - i], self.dict['f'][2][i]
-
-    # Rotate face clockwise
-    def __rotate_clock(self, face):
-        temp = self.dict[face][0][0]
-        self.dict[face][0][0] = self.dict[face][2][0]
-        self.dict[face][2][0] = self.dict[face][2][2]
-        self.dict[face][2][2] = self.dict[face][0][2]
-        self.dict[face][0][2] = temp
-        temp = self.dict[face][0][1]
-        self.dict[face][0][1] = self.dict[face][1][0]
-        self.dict[face][1][0] = self.dict[face][2][1]
-        self.dict[face][2][1] = self.dict[face][1][2]
-        self.dict[face][1][2] = temp
-
-    # Rotate face counterclockwise
-    def __rotate_counter(self, face):
-        temp = self.dict[face][0][0]
-        self.dict[face][0][0] = self.dict[face][0][2]
-        self.dict[face][0][2] = self.dict[face][2][2]
-        self.dict[face][2][2] = self.dict[face][2][0]
-        self.dict[face][2][0] = temp
-        temp = self.dict[face][0][1]
-        self.dict[face][0][1] = self.dict[face][1][2]
-        self.dict[face][1][2] = self.dict[face][2][1]
-        self.dict[face][2][1] = self.dict[face][1][0]
-        self.dict[face][1][0] = temp
-
-    # Rotate face twice
-    def __rotate__2(self, face):
-        self.dict[face][0][0], self.dict[face][2][2] = self.dict[face][2][2], self.dict[face][0][0]
-        self.dict[face][0][2], self.dict[face][2][0] = self.dict[face][2][0], self.dict[face][0][2]
-        self.dict[face][0][1], self.dict[face][2][1] = self.dict[face][2][1], self.dict[face][0][1]
-        self.dict[face][1][0], self.dict[face][1][2] = self.dict[face][1][2], self.dict[face][1][0]
 
     # Display cube in unfolded format (cross on its side)
     def display(self):
