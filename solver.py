@@ -1,3 +1,5 @@
+import random
+
 #Represents a Rubik's cube
 class Cube(object):
     solved_cube = {'l':[['o']*3 for i in range(3)],
@@ -10,14 +12,31 @@ class Cube(object):
     moves = ['l', 'l\'', 'l2', 'f', 'f\'', 'f2', 'r', 'r\'', 'r2',
              'b', 'b\'', 'b2', 'u', 'u\'', 'u2', 'd', 'd\'', 'd2'] 
 
-    def __init__(self, randomizer=None):
-        self.dict = {'l':[['o']*3 for i in range(3)],
-                     'f':[['g']*3 for i in range(3)],
-                     'r':[['r']*3 for i in range(3)],
-                     'b':[['b']*3 for i in range(3)],
-                     'u':[['w']*3 for i in range(3)],
-                     'd':[['y']*3 for i in range(3)]}
-        self.parse_randomizer(randomizer)
+    def __init__(self, randomizer=None, scramble=False):
+        self.reset()
+        if scramble:
+            self.scramble()
+        else:
+            self.parse_randomizer(randomizer)
+
+    #Resets cube to solved state
+    def reset(self, print_msg=False):
+        self.dict = {'l': [['o']*3 for i in range(3)],
+                     'f': [['g']*3 for i in range(3)],
+                     'r': [['r']*3 for i in range(3)],
+                     'b': [['b']*3 for i in range(3)],
+                     'u': [['w']*3 for i in range(3)],
+                     'd': [['y']*3 for i in range(3)]}
+        if print_msg:
+            print('Cube was reset to solved state')
+
+    #Randomly scrambles the cube
+    def scramble(self):
+        scramble_length = random.randint(5, 15)
+        scramble_moves = random.choices(Cube.moves, k=scramble_length)
+        scramble_str = ' '.join(scramble_moves)
+        self.parse_randomizer(scramble_str)
+        print(scramble_str)
 
     #Goes through the randomizer string to change the cube state move by move
     def parse_randomizer(self, randomizer):
@@ -25,7 +44,9 @@ class Cube(object):
         if randomizer is not None:
             if isinstance(randomizer, str) and len(randomizer) is not 0:
                 lower = randomizer.lower()
+                #Removes all the valid characters in string to create 'trans'
                 trans = lower.translate(dict.fromkeys(map(ord, ' \'lfrbud2'), None))
+                #trans having 0 length means string only has valid characters
                 if len(trans) is 0:
                     arr = randomizer.strip().split(' ')
                     for move in arr:
@@ -67,7 +88,7 @@ class Cube(object):
                             self.d_2()
                         else:
                             print('Reverted to solved state as randomizer could not be parsed correctly')
-                            self.dict = dict(Cube.solved_cube)
+                            self.reset()
                 else:
                     print('Cube state unchanged as randomizer was not in valid WCA format') 
             else:
@@ -86,6 +107,7 @@ class Cube(object):
             return False
         else:
             for move in Cube.moves:
+                #Take a move from the list of moves
                 self.parse_randomizer(move)
                 moves_taken.append(move)
                 if self.__rec_solve(num_left - 1, moves_taken):
@@ -346,29 +368,48 @@ class Cube(object):
         for i in range(3):
             print('      ' + mat[i][0] + ' ' + mat[i][1] + ' ' + mat[i][2])
 
+
+display_msg = """\nOptions:\n1 to solve\n2 to create new cube
+3 to enter randomizer string\n4 to check if cube is solved
+5 to reset cube\n6 to re-scramble cube\nAnything else to exit"""
+
 def main():
-    rubik = Cube(input('Enter cube randomizer string in WCA format: '))
-    rubik.display()
-    print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\n4 to check if cube is solved')
-    print('Anything else to exit')
-    choice = input('Enter input here: ')
-    while (choice == '1' or choice == '2' or choice == '3' or choice == '4'):
-        print()
-        if choice == '1':
-            rubik.solve()
-        elif choice == '2':
+    ch = input("""Options:\n1 to enter randomizer string\n2 to randomly scramble cube
+3 to start with solved cube\nEnter your choice here: """)
+    if (ch in ('1', '2', '3')):
+        if ch == '1':
             rubik = Cube(input('Enter cube randomizer string in WCA format: '))
-        elif choice == '3':
-            rubik.parse_randomizer(input('Enter cube randomizer string in WCA format: '))
-        else:
-            if rubik.check_solved():
-                print('Cube is solved.')
-            else:
-                print('Cube is not solved.')
+        elif ch == '2':
+            rubik = Cube(scramble=True)
+        elif ch == '3':
+            rubik = Cube()
         rubik.display()
-        print('\nOptions:\n1 to solve\n2 to create new cube\n3 to enter randomizer string\n4 to check if cube is solved')
-        print('Anything else to exit')
+        print(display_msg)
         choice = input('Enter input here: ')
+        while (choice in ('1', '2', '3', '4', '5', '6')):
+            print()
+            if choice == '1':
+                rubik.solve()
+            elif choice == '2':
+                rubik = Cube(input('Enter cube randomizer string in WCA format: '))
+            elif choice == '3':
+                rubik.parse_randomizer(input('Enter cube randomizer string in WCA format: '))
+            elif choice == '4':
+                if rubik.check_solved():
+                    print('Cube is solved.')
+                else:
+                    print('Cube is not solved.')
+            elif choice == '5':
+                rubik.reset(print_msg=True)
+            elif choice == '6':
+                rubik.reset()
+                rubik.scramble()
+            rubik.display()
+            print(display_msg)
+            choice = input('Enter input here: ')
+    else:
+        print('Exiting - you must choose 1, 2, or 3')
+
 
 if __name__ == '__main__':
     main()
