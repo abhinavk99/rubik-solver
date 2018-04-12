@@ -54,49 +54,18 @@ class Cube(object):
                 if len(trans) is 0:
                     arr = randomizer.strip().split(' ')
                     for move in arr:
-                        if move == 'l':
-                            self.l()
-                        elif move == 'l\'':
-                            self.l_prime()
-                        elif move == 'l2':
-                            self.l_2()
-                        elif move == 'f':
-                            self.f()
-                        elif move == 'f\'':
-                            self.f_prime()
-                        elif move == 'f2':
-                            self.f_2()
-                        elif move == 'r':
-                            self.r()
-                        elif move == 'r\'':
-                            self.r_prime()
-                        elif move == 'r2':
-                            self.r_2()
-                        elif move == 'b':
-                            self.b()
-                        elif move == 'b\'':
-                            self.b_prime()
-                        elif move == 'b2':
-                            self.b_2()
-                        elif move == 'u':
-                            self.u()
-                        elif move == 'u\'':
-                            self.u_prime()
-                        elif move == 'u2':
-                            self.u_2()
-                        elif move == 'd':
-                            self.d()
-                        elif move == 'd\'':
-                            self.d_prime()
-                        elif move == 'd2':
-                            self.d_2()
-                        else:
-                            print(
-                                'Reverted to solved state as randomizer could not be parsed correctly')
+                        # Convert move string to function name
+                        move = move.replace('\'', '_prime')
+                        move = move.replace('2', '_2')
+                        # Gets function from name, 0 returned if func not found
+                        move_func = getattr(self, move, 0)
+                        if move_func == 0:
+                            print('Reverted to solved state as randomizer could not be parsed correctly')
                             self.reset()
+                        else:
+                            move_func()
                 else:
-                    print(
-                        'Cube state unchanged as randomizer was not invalid WCA format')
+                    print('Cube state unchanged as randomizer was not invalid WCA format')
             else:
                 print('Cube state unchanged as no randomizer was passed in')
 
@@ -130,14 +99,6 @@ class Cube(object):
     # Checks if cube is solved
     def check_solved(self):
         faces = ['l', 'f', 'r', 'b', 'u', 'd']
-        # for i in range(3):
-        #     for j in range(3):
-        #         for k in range(6):
-        #             curr_facelet = self.dict[faces[k]][i][j]
-        #             solved_facelet = Cube.solved_cube[faces[k]][i][j]
-        #             if curr_facelet != solved_facelet:
-        #                 return False
-
         for face in faces:
             if self.dict[face] != Cube.solved_cube[face]:
                 return False
@@ -212,10 +173,8 @@ class Cube(object):
     def f_2(self):
         self.dict['f'].rotate_2()
         for i in range(3):
-            self.dict['u'][2][i], self.dict['d'][0][2 -
-                                                    i] = self.dict['d'][0][2 - i], self.dict['u'][2][i]
-            self.dict['r'][i][0], self.dict['l'][2 -
-                                                 i][2] = self.dict['l'][2 - i][2], self.dict['r'][i][0]
+            self.dict['u'][2][i], self.dict['d'][0][2 - i] = self.dict['d'][0][2 - i], self.dict['u'][2][i]
+            self.dict['r'][i][0], self.dict['l'][2 - i][2] = self.dict['l'][2 - i][2], self.dict['r'][i][0]
 
     # Moving right side of cube
     def r(self):
@@ -276,10 +235,8 @@ class Cube(object):
     def b_2(self):
         self.dict['b'].rotate_2()
         for i in range(3):
-            self.dict['u'][0][i], self.dict['d'][2][2 -
-                                                    i] = self.dict['d'][2][2 - i], self.dict['u'][0][i]
-            self.dict['r'][i][2], self.dict['l'][2 -
-                                                 i][0] = self.dict['l'][2 - i][0], self.dict['r'][i][2]
+            self.dict['u'][0][i], self.dict['d'][2][2 - i] = self.dict['d'][2][2 - i], self.dict['u'][0][i]
+            self.dict['r'][i][2], self.dict['l'][2 - i][0] = self.dict['l'][2 - i][0], self.dict['r'][i][2]
 
     # Moving upper side of cube
     def u(self):
@@ -306,8 +263,7 @@ class Cube(object):
         self.dict['u'].rotate_2()
         self.dict['l'][0], self.dict['r'][0] = self.dict['r'][0], self.dict['l'][0]
         for i in range(3):
-            self.dict['f'][0][i], self.dict['b'][2][2 -
-                                                    i] = self.dict['b'][2][2 - i], self.dict['f'][0][i]
+            self.dict['f'][0][i], self.dict['b'][2][2 - i] = self.dict['b'][2][2 - i], self.dict['f'][0][i]
 
     # Moving down side of cube
     def d(self):
@@ -334,8 +290,7 @@ class Cube(object):
         self.dict['d'].rotate_2()
         self.dict['l'][2], self.dict['r'][2] = self.dict['r'][2], self.dict['l'][2]
         for i in range(3):
-            self.dict['f'][2][i], self.dict['b'][0][2 -
-                                                    i] = self.dict['b'][0][2 - i], self.dict['f'][2][i]
+            self.dict['f'][2][i], self.dict['b'][0][2 - i] = self.dict['b'][0][2 - i], self.dict['f'][2][i]
 
     # Display cube in unfolded format (cross on its side)
     def __str__(self):
