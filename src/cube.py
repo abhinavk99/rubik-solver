@@ -74,9 +74,9 @@ class Cube(object):
         self.__rec_solve(15, [])
 
     # Uses depth first search with a maximum iteration depth to find a solution
-    def __rec_solve(self, num_left, moves_taken):
+    def _rec_solve(self, num_left, moves_taken):
         if self.check_solved():
-            self.__print_moves(moves_taken)
+            self._print_moves(moves_taken)
             return True
         elif num_left == 0:
             return False
@@ -85,7 +85,7 @@ class Cube(object):
                 #Take a move from the list of moves
                 self.parse_randomizer(move)
                 moves_taken.append(move)
-                if self.__rec_solve(num_left - 1, moves_taken):
+                if self._rec_solve(num_left - 1, moves_taken):
                     return True
                 moves_taken.pop()
                 # Revert the move just taken to try the next move
@@ -105,7 +105,7 @@ class Cube(object):
         return True
 
     # Prints contents of moves list
-    def __print_moves(self, moves_taken):
+    def _print_moves(self, moves_taken):
         if len(moves_taken) == 0:
             print('Already in solved state')
         else:
