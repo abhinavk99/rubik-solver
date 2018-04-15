@@ -73,7 +73,7 @@ class Cube(object):
                                                       None))
                 # Move string is correct if the translated string is empty
                 if len(trans) is 0:
-                    arr = randomizer.strip().split(' ')
+                    arr = lower.strip().split(' ')
                     for move in arr:
                         # Convert move string to function name
                         move = move.replace('\'', '_prime')
