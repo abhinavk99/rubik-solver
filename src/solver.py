@@ -13,84 +13,121 @@ class RubikSolverGUI:
         self.rand_string_button = Button(master, text='Enter randomizer string', command=self.randStringEntry)
         self.rand_string_button.pack()
 
-        self.rand_scramble_button = Button(master, text='Randomly scramble cube', command=self.randScramble)
+        self.rand_scramble_button = Button(master, text='Randomly scramble cube', command=self.startRandScramble)
         self.rand_scramble_button.pack()
 
-        self.solved_button = Button(master, text='Start with solved cube', command=self.resetCube)
+        self.solved_button = Button(master, text='Start with solved cube', command=self.startSolved)
         self.solved_button.pack()
 
     def randStringEntry(self):
         """Sets up GUI for entering the randomizer string"""
         self.destroyInitButtons()
+        self.showEntry(self.randStringCreate)
+
+    def randStringCreate(self):
+        """Creates the cube with the randomizer string"""
+        self.string_entry.destroy()
+        self.create_button.destroy()
+        self.rubik = Cube(self.string.get())
+        self.showOptions()
+        print(str(self.rubik))
+
+    def startRandScramble(self):
+        """Creates a randomly scrambled cube"""
+        self.destroyInitButtons()
+        self.rubik = Cube(scramble=True)
+        self.showOptions()
+        print(str(self.rubik))
+
+    def startSolved(self):
+        """Starts the cube to solved state"""
+        self.destroyInitButtons()
+        self.rubik = Cube()
+        self.showOptions()
+        print(str(self.rubik))
+
+    def showOptions(self):
+        """Shows options for acting on cube"""
+        self.solve_button = Button(self.master, text='Solve cube', command=self.solveCube)
+        self.solve_button.pack()
+
+        self.new_scramble_button = Button(self.master, text='Enter move string for new cube', command=self.newCubeEntry)
+        self.new_scramble_button.pack()
+
+        self.add_moves_button = Button(self.master, text='Add moves to current cube', command=self.addMovesEntry)
+        self.add_moves_button.pack()
+
+        self.check_solved_button = Button(self.master, text='Check if cube is solved', command=self.checkCubeSolved)
+        self.check_solved_button.pack()
+
+        self.reset_button = Button(self.master, text='Reset cube', command=self.resetCube)
+        self.reset_button.pack()
+
+        self.rand_scramble_button = Button(self.master, text='Randomly scramble cube', command=self.randScramble)
+        self.rand_scramble_button.pack()
+
+    def solveCube(self):
+        """Solves the cube"""
+        self.rubik.solve()
+        print(str(self.rubik))
+
+    def newCubeEntry(self):
+        """Sets up GUI to create a new cube with randomizer string"""
+        self.destroyOptions()
+        self.showEntry(self.randStringCreate)
+
+    def addMovesEntry(self):
+        """Sets up GUI to add moves to current cube with randomizer string"""
+        self.destroyOptions()
+        self.showEntry(self.addMoves)
+
+    def addMoves(self):
+        """Add moves to current cube with randomizer string"""
+        self.string_entry.destroy()
+        self.create_button.destroy()
+        self.rubik.parse_randomizer(self.string.get())
+        self.showOptions()
+        print(str(self.rubik))
+
+    def showEntry(self, method):
+        """Sets up GUI for entering randomizer string"""
         self.string = StringVar()
 
         self.string_entry = Entry(self.master, width=100, textvariable=self.string)
         self.string_entry.pack()
 
-        self.create_button = Button(self.master, text='Create', command=self.randStringCreate)
+        self.create_button = Button(self.master, text='Create', command=method)
         self.create_button.pack()
 
-    def randStringCreate(self):
-        """Creates the cube with the randomizer string"""
-        self.rubik = Cube(self.string.get())
-        print(str(self.rubik))
-
-    def randScramble(self):
-        """Creates a randomly scrambled cube"""
-        self.destroyInitButtons()
-        self.rubik = Cube(scramble=True)
+    def checkCubeSolved(self):
+        """Checks if cube is solved"""
+        print('Cube is ' + ('' if self.rubik.check_solved() else 'not ') + 'solved.')
         print(str(self.rubik))
 
     def resetCube(self):
         """Resets the cube to solved state"""
-        self.destroyInitButtons()
-        self.rubik.reset()
+        self.rubik.reset(print_msg=True)
+        print(str(self.rubik))
+
+    def randScramble(self):
+        """Randomly scrambles the cube"""
+        self.rubik = Cube(scramble=True)
         print(str(self.rubik))
 
     def destroyInitButtons(self):
+        """Destroys initial buttons"""
         self.rand_string_button.destroy()
         self.rand_scramble_button.destroy()
         self.solved_button.destroy()
 
-display_msg = """
-Options:
-1 to solve
-2 to create new cube
-3 to enter randomizer string
-4 to check if cube is solved
-5 to reset cube
-6 to re-scramble cube
-Anything else to exit"""
-
-def display_info(rubik):
-    """Shows information about cube's state and asks for next input"""
-    print(str(rubik) + '\n' + display_msg)
-    return input('Enter input here: ')
-
-def main():
-    """Creates a cube and does operations on it based on user input"""
-    op = input(start_msg)
-    if op in '123':
-        # Create the cube from the options in the dict
-        rubik = cube_init[op]()
-        choice = display_info(rubik)
-        while choice in '123456':
-            print()
-            if choice == '1':
-                rubik.solve()
-            elif choice == '2':
-                rubik = Cube(input('Enter cube randomizer string in WCA format: '))
-            elif choice == '3':
-                rubik.parse_randomizer(input('Enter cube randomizer string in WCA format: '))
-            elif choice == '4':
-                print('Cube is ' + ('' if rubik.check_solved() else 'not ') + 'solved.')
-            elif choice == '5':
-                rubik.reset(print_msg=True)
-            elif choice == '6':
-                rubik.scramble()
-            choice = display_info(rubik)
-    else:
-        print('Exiting - you must choose 1, 2, or 3')
+    def destroyOptions(self):
+        """Destroys options buttons"""
+        self.solve_button.destroy()
+        self.new_scramble_button.destroy()
+        self.add_moves_button.destroy()
+        self.check_solved_button.destroy()
+        self.reset_button.destroy()
+        self.rand_scramble_button.destroy()
 
 
 top = Tk()
