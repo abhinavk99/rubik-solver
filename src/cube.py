@@ -35,7 +35,7 @@ class Cube(object):
             self.parse_randomizer(randomizer)
 
     # Resets cube to solved state
-    def reset(self, print_msg=False):
+    def reset(self):
         """Resets the cube to solved state
 
         Keyword arguments:
@@ -49,8 +49,6 @@ class Cube(object):
             'u': Face('w'),
             'd': Face('y')
         }
-        if print_msg:
-            print('Cube was reset to solved state')
 
     # Randomly scrambles the cube
     def scramble(self):
@@ -60,7 +58,7 @@ class Cube(object):
         scramble_moves = random.choices(Cube.moves, k=scramble_length)
         scramble_str = ' '.join(scramble_moves)
         self.parse_randomizer(scramble_str)
-        print(scramble_str)
+        return scramble_str
 
     def parse_randomizer(self, randomizer):
         """Does each move in the move string on the cube"""
@@ -81,14 +79,14 @@ class Cube(object):
                         # Gets function from name, 0 returned if func not found
                         move_func = getattr(self, move, 0)
                         if move_func == 0:
-                            print('Reverted to solved state as randomizer could not be parsed correctly')
+                            raise ValueError('Reverted to solved state as randomizer could not be parsed correctly')
                             self.reset()
                         else:
                             move_func()
                 else:
-                    print('Cube state unchanged as randomizer was not invalid WCA format')
+                    raise ValueError('Cube state unchanged as randomizer was not invalid WCA format')
             else:
-                print('Cube state unchanged as no randomizer was passed in')
+                raise ValueError('Cube state unchanged as no randomizer was passed in')
 
     def solve(self):
         """Solves the cube"""

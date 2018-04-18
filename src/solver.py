@@ -19,7 +19,7 @@ class RubikSolverGUI:
         self.solved_button = Button(master, text='Start with solved cube', command=self.startSolved)
         self.solved_button.pack()
 
-        self.canvas = Canvas(master, width=400, height=300)
+        self.canvas = Canvas(master, width=400, height=350)
         self.canvas.pack()
 
     def randStringEntry(self):
@@ -38,7 +38,10 @@ class RubikSolverGUI:
     def startRandScramble(self):
         """Creates a randomly scrambled cube"""
         self.destroyInitButtons()
-        self.rubik = Cube(scramble=True)
+        self.rubik = Cube()
+        scramble_str = self.rubik.scramble()
+        self.canvas.create_text(120, 300, fill='black', font='Helvetica 13',
+                                text=scramble_str)
         self.showOptions()
         self.drawCube()
 
@@ -72,29 +75,38 @@ class RubikSolverGUI:
     def solveCube(self):
         """Solves the cube"""
         self.rubik.solve()
+        self.canvas.delete('all')
         self.drawCube()
 
     def newCubeEntry(self):
         """Sets up GUI to create a new cube with randomizer string"""
         self.destroyOptions()
+        self.canvas.delete('all')
         self.showEntry(self.randStringCreate)
 
     def addMovesEntry(self):
         """Sets up GUI to add moves to current cube with randomizer string"""
         self.destroyOptions()
+        self.canvas.delete('all')
         self.showEntry(self.addMoves)
 
     def addMoves(self):
         """Add moves to current cube with randomizer string"""
         self.string_entry.destroy()
         self.create_button.destroy()
-        self.rubik.parse_randomizer(self.string.get())
+        self.canvas.delete('all')
+        try:
+            self.rubik.parse_randomizer(self.string.get())
+        except ValueError as e:
+            self.canvas.create_text(120, 300, fill='black', font='Helvetica 13',
+                                    text=str(e))
         self.showOptions()
         self.drawCube()
 
     def showEntry(self, method):
         """Sets up GUI for entering randomizer string"""
         self.string = StringVar()
+        self.canvas.delete('all')
 
         self.string_entry = Entry(self.master, width=100, textvariable=self.string)
         self.string_entry.pack()
@@ -104,17 +116,27 @@ class RubikSolverGUI:
 
     def checkCubeSolved(self):
         """Checks if cube is solved"""
-        print('Cube is ' + ('' if self.rubik.check_solved() else 'not ') + 'solved.')
+        res = 'Cube is ' + ('' if self.rubik.check_solved() else 'not ') + 'solved.'
+        self.canvas.delete('all')
+        self.canvas.create_text(120, 300, fill='black', font='Helvetica 13',
+                                text=res)
         self.drawCube()
 
     def resetCube(self):
         """Resets the cube to solved state"""
-        self.rubik.reset(print_msg=True)
+        self.rubik.reset()
+        self.canvas.delete('all')
+        self.canvas.create_text(120, 300, fill='black', font='Helvetica 13',
+                                text='Reset cube to solved state.')
         self.drawCube()
 
     def randScramble(self):
         """Randomly scrambles the cube"""
-        self.rubik = Cube(scramble=True)
+        self.rubik = Cube()
+        scramble_str = self.rubik.scramble()
+        self.canvas.delete('all')
+        self.canvas.create_text(120, 300, fill='black', font='Helvetica 13',
+                                text=scramble_str)
         self.drawCube()
 
     def destroyInitButtons(self):
