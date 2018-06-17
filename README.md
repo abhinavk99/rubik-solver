@@ -6,3 +6,7 @@ Uses a Python dictionary to store the state of the cube and has methods to alter
 12/28/2017: Movement of all faces is completed. Solving the cube to come later.
 
 1/4/2018: Added solving capability (depth first search with maximum iteration depth of 15).
+
+3/27/2018: Added random scrambling option
+
+4/17/2018: Finished creating a GUI for the program
